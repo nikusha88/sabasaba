@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>შაბლონების საძიებო სისტემა</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #4CAF50;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            padding: 50px;
+        }
+
+        .search-box {
+            width: 50%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 2px solid #4CAF50;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-btn {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+
+        .search-btn:hover {
+            background-color: #45a049;
+        }
+
+        .color-switcher {
+            text-align: center;
+            margin: 20px;
+        }
+
+        .color-switcher button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        .result-container {
+            margin: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .result-container ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .result-container ul li {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .result-container ul li:last-child {
+            border-bottom: none;
+        }
+
+        .calculator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            max-width: 300px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000; /* Makes sure it stays on top */
+        }
+
+        .calculator input {
+            width: calc(100% - 20px);
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 5px;
+            border: 2px solid #4CAF50;
+        }
+
+        .calculator button {
+            width: 48%;
+            margin: 1%;
+            padding: 10px;
+            font-size: 18px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .calculator button:hover {
+            background-color: #45a049;
+        }
+
+        .calculator #result {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>შაბლონების საძიებო სისტემა</h1>
+        <p>მოძებნე მარტივად</p>
+    </header>
+
+    <div class="search-container">
+        <input type="text" class="search-box" id="searchInput" placeholder="ძებნა..." onkeydown="checkEnter(event)">
+        <button class="search-btn" onclick="searchText()">ძებნა</button>
+    </div>
+
+    <div class="result-container" id="resultContainer">
+        <ul id="resultList"></ul>
+    </div>
+
+    <div class="color-switcher">
+        <h2>ფერების შეცვლა</h2>
+        <button onclick="changeColor('#ADD8E6')">ლურჯი</button>
+        <button onclick="changeColor('#90EE90')">მწვანე</button>
+        <button onclick="changeColor('#FFB6C1')">ვარდისფერი</button>
+        <button onclick="changeColor('#FFFFFF')">თეთრი</button>
+    </div>
+
+    <div class="calculator">
+        <h2>კალკულატორი</h2>
+        <input type="number" id="num1" placeholder="რიცხვი 1">
+        <input type="number" id="num2" placeholder="რიცხვი 2">
+        <div>
+            <button onclick="calculate('add')">დამატება</button>
+            <button onclick="calculate('subtract')">გამოკლება</button>
+            <button onclick="calculate('multiply')">გამრავლება</button>
+            <button onclick="calculate('divide')">გაყოფა</button>
+        </div>
+        <p id="result">შედეგი: -</p>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 საბას საძიებო სისტემა. ყველა უფლება დაცულია.</p>
+    </footer>
+
+    <script>
+        const predefinedSentences = [
+            "გამარჯობა საბა ლილე",
+            "როგორ ხარ?",
+            "სავარჯიშო პროგრამა",
+            "შოპინგის რჩევები",
+            "ფიტნესი",
+            "სამოგზაურო რჩევები",
+            "ინტერნეტ მარკეტინგი",
+            "ქალაქის ისტორია",
+            "პროგრამირების გაკვეთილები",
+            "ელექტრონიკა",
+            "შოუები და ფილმები",
+            "ბიზნესი",
+            "ქიმია",
+            "ბიოლოგია",
+            "მუსიკა",
+            "სასიყვარულო რჩევები",
+            "რესტორნების მიმოხილვა",
+            "ტექნოლოგიური სიახლეები",
+            "სოციალური მედია",
+            "სპორტი",
+            "ფეხბურთი",
+            "კალათბურთი",
+            "ყურადღება",
+            "შემთხვევები",
+            "თამაშები",
+            "ფსიქოლოგია",
+            "შეფუთვა",
+            "ბლოგინგი",
+            "მოდელები",
+            "კულინარია",
+            "კლიმატი",
+            "დეკორაცია",
+            "სახლის მოწყობა",
+            "სამზარეულო",
+            "ცხოველები",
+            "ზამთარი",
+            "შაბათობა",
+            "ნარდი",
+            "ყავა",
+            "საზღვარგარეთ",
+            "უნივერსიტეტი",
+            "სწავლა",
+            "თანდაყოფა",
+            "პოეზია",
+            "ავტომობილები",
+            "ინტერვიუები",
+            "პრაქტიკა",
+            "პერსონალური განვითარება",
+            "გამოსასვლელი"
+        ];
+
+        function searchText() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const resultContainer = document.getElementById('resultContainer');
+            const resultList = document.getElementById('resultList');
+            resultList.innerHTML = '';
+
+            const filtered = predefinedSentences.filter(sentence => sentence.toLowerCase().includes(input));
+
+            if (filtered.length) {
+                resultContainer.style.display = 'block';
+                filtered.forEach(sentence => {
+                    const li = document.createElement('li');
+                    li.textContent = sentence;
+                    resultList.appendChild(li);
+                });
+            } else {
+                resultContainer.style.display = 'none';
+            }
+        }
+
+        function checkEnter(event) {
+            if (event.key === 'Enter') searchText();
+        }
+
+        function changeColor(color) {
+            document.body.style.backgroundColor = color;
+        }
+
+        function calculate(operation) {
+            const num1 = parseFloat(document.getElementById('num1').value);
+            const num2 = parseFloat(document.getElementById('num2').value);
+            if (isNaN(num1) || isNaN(num2)) {
+                document.getElementById('result').textContent = 'შეცდომა! გთხოვთ ჩაწერეთ რიცხვები.';
+                return;
+            }
+
+            let result;
+            switch (operation) {
+                case 'add':
+                    result = num1 + num2;
+                    break;
+                case 'subtract':
+                    result = num1 - num2;
+                    break;
+                case 'multiply':
+                    result = num1 * num2;
+                    break;
+                case 'divide':
+                    result = num2 !== 0 ? num1 / num2 : 'არ შეიძლება გაყოფა ნულზე';
+                    break;
+            }
+            document.getElementById('result').textContent = `შედეგი: ${result}`;
+        }
+    </script>
+
+</body>
+</html>
